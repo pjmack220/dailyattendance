@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Anax Daily Attendance</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #f5f7fa;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+
+    .container {
+      background-color: #fff;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      max-width: 450px;
+      width: 100%;
+    }
+
+    .container h2 {
+      text-align: center;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+
+    label {
+      font-weight: 500;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    input[type="text"],
+    select,
+    input[type="file"] {
+      width: 100%;
+      padding: 10px 12px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 15px;
+      font-family: 'Roboto', sans-serif;
+      color: #333;
+      background-color: #fff;
+      transition: border 0.3s, box-shadow 0.3s;
+    }
+
+    input[type="text"]:focus,
+    select:focus {
+      border-color: #007bff;
+      box-shadow: 0 0 5px rgba(0,123,255,0.3);
+      outline: none;
+    }
+
+    button {
+      width: 100%;
+      background-color: #007bff;
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    #confirmation {
+      margin-top: 15px;
+      color: green;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    #logo {
+      display: block;
+      margin: 0 auto 15px auto;
+      max-width: 120px;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <img src="https://via.placeholder.com/150x50?text=Anax+Logo" alt="Anax Logo" id="logo" />
+    <h2>Anax Attendance Form</h2>
+
+    <form id="attendanceForm" method="POST" action="https://script.google.com/macros/s/AKfycbwUY_6y9rttyur6cox5HvZWHGbSlZr4RQW8Pxt-6Mpyw5yfchfocKihgSKlDHXlY3dljw/exec">
+      <label for="shift">Shift</label>
+      <select id="shift" name="shift" required>
+        <option value="">Select Shift</option>
+        <option value="Day">Day</option>
+        <option value="Night">Night</option>
+      </select>
+
+      <label for="site">Site Name</label>
+      <select id="site" name="site" required onchange="handleSiteChange()">
+        <option value="">Select Site</option>
+        <option value="Jeevan Lifestyle (Phase 3-4)">Jeevan Lifestyle (Phase 3-4)</option>
+        <option value="Jeevan Lifestyle (Phase 5)">Jeevan Lifestyle (Phase 5)</option>
+        <option value="Konark Garden">Konark Garden</option>
+        <option value="Shreeji Iconic">Shreeji Iconic</option>
+        <option value="Kalp Green">Kalp Green</option>
+        <option value="Shubham Karoti">Shubham Karoti</option>
+        <option value="Other">Other</option>
+      </select>
+
+      <div id="otherSiteWrapper" class="hidden">
+        <label for="otherSite">Specify Site Name</label>
+        <input type="text" id="otherSite" name="otherSite" placeholder="Enter Site Name" />
+      </div>
+
+      <div id="supervisorWrapper">
+        <label for="supervisorName">Supervisor Name</label>
+        <input type="text" id="supervisorName" name="supervisorName" placeholder="Enter Supervisor Name" />
+      </div>
+
+      <label for="guard1">Guard Name 01</label>
+      <input type="text" id="guard1" name="guard1" placeholder="Enter Guard Name 01" required />
+
+      <label for="guard2">Guard Name 02</label>
+      <input type="text" id="guard2" name="guard2" placeholder="Enter Guard Name 02" required />
+
+      <div id="guard3Wrapper" class="hidden">
+        <label for="guard3">Guard Name 03</label>
+        <input type="text" id="guard3" name="guard3" placeholder="Enter Guard Name 03" />
+      </div>
+
+      <label for="photo">Upload Photo</label>
+      <input type="file" id="photo" name="photo" accept="image/*" required />
+
+      <!-- Hidden Date/Time/Location -->
+      <input type="hidden" id="datetime" name="datetime" />
+      <input type="hidden" id="location" name="location" />
+
+      <button type="submit">Submit</button>
+    </form>
+
+    <div id="confirmation"></div>
+  </div>
+
+  <script>
+    function handleSiteChange() {
+      const site = document.getElementById('site').value;
+      const guard3Wrapper = document.getElementById('guard3Wrapper');
+      const otherSiteWrapper = document.getElementById('otherSiteWrapper');
+      const supervisorWrapper = document.getElementById('supervisorWrapper');
+
+      const showGuard3 = site === "Jeevan Lifestyle (Phase 3-4)";
+      const hideSupervisorSites = [
+        "Jeevan Lifestyle (Phase 5)",
+        "Konark Garden",
+        "Shreeji Iconic",
+        "Kalp Green",
+        "Shubham Karoti"
+      ];
+
+      guard3Wrapper.classList.toggle('hidden', !showGuard3);
+      otherSiteWrapper.classList.toggle('hidden', site !== "Other");
+      supervisorWrapper.classList.toggle('hidden', hideSupervisorSites.includes(site));
+    }
+
+    function setDateTimeAndLocation() {
+      const datetime = new Date().toLocaleString();
+      document.getElementById('datetime').value = datetime;
+
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(position => {
+          const loc = `${position.coords.latitude},${position.coords.longitude}`;
+          document.getElementById('location').value = loc;
+        });
+      }
+    }
+
+    document.getElementById('attendanceForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      setDateTimeAndLocation();
+
+      document.getElementById('confirmation').innerText = "✅ Form submitted successfully. Great job team!";
+      setTimeout(() => {
+        document.getElementById('attendanceForm').reset();
+        document.getElementById('confirmation').innerText = "";
+        document.getElementById('guard3Wrapper').classList.add('hidden');
+        document.getElementById('otherSiteWrapper').classList.add('hidden');
+        document.getElementById('supervisorWrapper').classList.remove('hidden');
+      }, 5000);
+    });
+
+    // Set datetime and location on load
+    window.onload = setDateTimeAndLocation;
+  </script>
+</body>
+</html>
